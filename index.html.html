@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BlackFound — The PulseNetworkHoldings Ecosystem</title>
+<style>
+/* ============================================================
+   BLACKFOUND.COM
+   Single-file ecosystem showcase. No emojis. No third parties.
+   ------------------------------------------------------------
+   EDIT YOUR PALETTE HERE (mirrors ERBrights — adjust hexes to
+   match the live ERBrights values exactly when you verify them):
+   ============================================================ */
+:root{
+  --bg:        #0B0F14;   /* deep near-black background */
+  --surface:   #161B22;   /* lifted card surface */
+  --surface-2: #1F2630;   /* secondary surface */
+  --border:    #283342;   /* hairline borders */
+  --primary:   #2D8CFF;   /* ERBrights bright blue */
+  --accent:    #25D0E0;   /* electric cyan highlight */
+  --text:      #F5F7FA;   /* near-white text */
+  --muted:     #8A97A8;   /* muted secondary text */
+  --live:      #2FCB7A;   /* Live status */
+  --dev:       #F5B83D;   /* In Dev status */
+  --soon:      #6B7686;   /* Coming Soon status */
+
+  --maxw: 1180px;
+  --radius: 14px;
+  --shadow: 0 8px 30px rgba(0,0,0,.45);
+  --font-display: 'Georgia', 'Times New Roman', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+
+/* ---------- NAV ---------- */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(11,15,20,.85);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  max-width:var(--maxw);margin:0 auto;padding:14px 22px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.wordmark{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:.5px}
+.wordmark span{color:var(--primary)}
+.nav-links{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+
+/* ---------- HERO ---------- */
+.hero{
+  max-width:var(--maxw);margin:0 auto;padding:84px 22px 56px;
+  position:relative;
+}
+.eyebrow{
+  display:inline-block;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--border);border-radius:999px;
+  padding:6px 14px;margin-bottom:24px;
+}
+.hero h1{
+  font-family:var(--font-display);
+  font-size:clamp(38px,6vw,68px);line-height:1.05;font-weight:700;
+  max-width:880px;margin-bottom:22px;
+}
+.hero h1 .grad{
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero-lead{font-size:clamp(17px,2.2vw,21px);color:var(--muted);max-width:680px;margin-bottom:34px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 26px;border-radius:10px;font-size:15px;font-weight:600;
+  border:1px solid transparent;cursor:pointer;transition:.18s;
+}
+.btn.primary{background:var(--primary);color:#06101f}
+.btn.primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn.ghost{border-color:var(--border);color:var(--text);background:transparent}
+.btn.ghost:hover{border-color:var(--primary)}
+
+/* ---------- FOUNDER ---------- */
+.founder{
+  max-width:var(--maxw);margin:0 auto;padding:30px 22px 10px;
+}
+.founder-card{
+  background:linear-gradient(180deg,var(--surface),var(--surface-2));
+  border:1px solid var(--border);border-radius:var(--radius);
+  padding:34px 32px;box-shadow:var(--shadow);
+}
+.founder-card .tag{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.founder-card h2{font-family:var(--font-display);font-size:26px;margin-bottom:14px}
+.founder-card p{color:var(--muted);max-width:760px;margin-bottom:10px}
+.founder-card p strong{color:var(--text)}
+
+/* ---------- STAT BAR ---------- */
+.stats{
+  max-width:var(--maxw);margin:40px auto 0;padding:0 22px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+}
+.stat{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:20px;text-align:center;
+}
+.stat .num{font-family:var(--font-display);font-size:30px;color:var(--primary);font-weight:700}
+.stat .lab{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+/* ---------- CONTROLS ---------- */
+.controls{
+  max-width:var(--maxw);margin:54px auto 0;padding:0 22px;
+  display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+}
+.section-head{font-family:var(--font-display);font-size:30px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  padding:11px 15px;border-radius:10px;font-size:14px;min-width:220px;
+}
+.search::placeholder{color:var(--muted)}
+.search:focus{outline:none;border-color:var(--primary)}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  background:var(--surface);border:1px solid var(--border);color:var(--muted);
+  padding:9px 15px;border-radius:999px;font-size:13px;cursor:pointer;transition:.15s;
+}
+.chip:hover{color:var(--text)}
+.chip.active{background:var(--primary);color:#06101f;border-color:var(--primary);font-weight:600}
+.btn.surprise{background:var(--accent);color:#04141a;font-weight:700}
+.btn.surprise:hover{filter:brightness(1.1)}
+
+/* ---------- GRID ---------- */
+.grid{
+  max-width:var(--maxw);margin:26px auto 0;padding:0 22px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;
+}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px;display:flex;flex-direction:column;transition:.18s;position:relative;
+}
+.card:hover{transform:translateY(-3px);border-color:var(--primary);box-shadow:var(--shadow)}
+.card.placeholder{border-style:dashed;opacity:.6}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.card h3{font-family:var(--font-display);font-size:21px}
+.badge{font-size:11px;letter-spacing:.6px;text-transform:uppercase;padding:4px 10px;border-radius:999px;font-weight:700;white-space:nowrap}
+.badge.live{background:rgba(47,203,122,.14);color:var(--live)}
+.badge.dev{background:rgba(245,184,61,.14);color:var(--dev)}
+.badge.soon{background:rgba(107,118,134,.18);color:var(--soon)}
+.cat-tag{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.card .what{color:var(--text);font-weight:600;margin-bottom:6px;font-size:14px}
+.card .why{color:var(--muted);font-size:14px;flex:1;margin-bottom:18px}
+.card .go{
+  align-self:flex-start;font-size:14px;font-weight:600;color:var(--primary);
+  border:1px solid var(--border);border-radius:9px;padding:9px 16px;transition:.15s;cursor:pointer;
+}
+.card .go:hover{background:var(--primary);color:#06101f;border-color:var(--primary)}
+.card .go.disabled{color:var(--muted);cursor:default}
+.card .go.disabled:hover{background:transparent;color:var(--muted);border-color:var(--border)}
+
+/* ---------- FOOTER ---------- */
+.footer{
+  border-top:1px solid var(--border);margin-top:70px;
+  background:var(--surface);
+}
+.footer-inner{max-width:var(--maxw);margin:0 auto;padding:36px 22px;color:var(--muted);font-size:13px}
+.footer-inner .fm{font-family:var(--font-display);font-size:18px;color:var(--text);margin-bottom:10px}
+.footer-inner p{max-width:760px;margin-bottom:8px}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:760px){
+  .nav-links{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .controls{flex-direction:column;align-items:stretch}
+  .tools{justify-content:space-between}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;scroll-behavior:auto!important}
+}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="wordmark">Black<span>Found</span></div>
+    <div class="nav-links">
+      <a href="#ecosystem">The Ecosystem</a>
+      <a href="#founder">The Founder</a>
+      <a href="#about">About</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <span class="eyebrow">A Black-Owned Software Ecosystem</span>
+  <h1>What you found here is <span class="grad">us</span> — a family of tools built by one founder.</h1>
+  <p class="hero-lead">BlackFound is the front door to the PulseNetworkHoldings ecosystem: real apps across faith, business, local services, and everyday life — each built to solve an actual problem, shipped one at a time, and gathered in one place.</p>
+  <div class="hero-cta">
+    <a href="#ecosystem" class="btn primary">Browse the Ecosystem</a>
+    <a href="#founder" class="btn ghost">Meet the Founder</a>
+  </div>
+</header>
+
+<!-- ============ FOUNDER ============ -->
+<section class="founder" id="founder">
+  <div class="founder-card">
+    <div class="tag">The Founder</div>
+    <h2>Built in-house, by one operator who ships.</h2>
+    <p>BlackFound is a <strong>Black-owned platform</strong>, built and operated under PulseNetworkHoldings LLC by a solo, self-taught founder turning a steady stream of ideas into real, launchable products. No outside studio, no borrowed credibility — just one builder, one standard of care, across the whole family of apps.</p>
+    <p>Every product here starts with a real problem and is built to stand on its own. This page exists so you can see all of it in one place, understand what each tool does and why it was built, and jump straight into whatever fits your need.</p>
+  </div>
+</section>
+
+<!-- ============ STAT BAR ============ -->
+<section class="stats" id="stats">
+  <div class="stat"><div class="num" id="stat-total">0</div><div class="lab">Products</div></div>
+  <div class="stat"><div class="num" id="stat-live">0</div><div class="lab">Live</div></div>
+  <div class="stat"><div class="num" id="stat-cats">0</div><div class="lab">Categories</div></div>
+  <div class="stat"><div class="num" id="stat-clicks">0</div><div class="lab">Total Visits</div></div>
+</section>
+
+<!-- ============ CONTROLS ============ -->
+<div class="controls" id="ecosystem">
+  <div class="section-head">The Ecosystem</div>
+  <div class="tools">
+    <input type="text" class="search" id="search" placeholder="Search products..." aria-label="Search products">
+    <button class="btn surprise" id="surprise">Surprise Me</button>
+  </div>
+</div>
+<div class="controls" style="margin-top:16px">
+  <div class="filters" id="filters"></div>
+</div>
+
+<!-- ============ GRID ============ -->
+<main class="grid" id="grid" aria-live="polite"></main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer" id="about">
+  <div class="footer-inner">
+    <div class="fm">Black<span style="color:var(--primary)">Found</span></div>
+    <p>BlackFound is a Black-owned platform built and operated by PulseNetworkHoldings LLC. It showcases software products built in-house. Links direct you to each product's own page or website. Product availability and status may change as the ecosystem grows.</p>
+    <p>&copy; <span id="year"></span> PulseNetworkHoldings LLC. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   EDIT YOUR PRODUCTS HERE — this is the ONLY place you touch
+   to add, remove, or update an app or its domain.
+   Append an object to add a new app. Set status to
+   "live" | "dev" | "soon".  Leave domain "" for placeholders.
+   ============================================================ */
+const PORTFOLIO = [
+  {
+    name: "Caught Up 417",
+    tagline: "A faith ministry platform — Bible study AI, prayer wall, and teaching.",
+    why: "Built to gather a ministry community in one trusted, KJV-grounded home.",
+    domain: "https://app.caughtup417.com",
+    category: "Faith",
+    status: "live"
+  },
+  {
+    name: "ERBrights",
+    tagline: "Mobile headlight restoration, booked online with dispatched operators.",
+    why: "Built to turn a hands-on local service into a clean, bookable platform.",
+    domain: "https://erbrights.vercel.app",
+    category: "Local Services",
+    status: "live"
+  },
+  {
+    name: "The Peptide App",
+    tagline: "Know before you dose — an AI-powered peptide knowledge base.",
+    why: "Built to give health-curious people citation-backed answers in one place.",
+    domain: "https://thepeptideapp.com",
+    category: "Consumer Tools",
+    status: "live"
+  },
+  {
+    name: "PulseHaul",
+    tagline: "Freight and hauling tools for operators on the move.",
+    why: "Built to bring order to the day-to-day of independent hauling.",
+    domain: "https://pulsehaul.com",
+    category: "Business SaaS",
+    status: "live"
+  },
+  {
+    name: "TripWarn",
+    tagline: "Travel scam intelligence — geofence alerts and community reports.",
+    why: "Built to keep travelers safe with a Traveler's Prayer that's always free.",
+    domain: "",
+    category: "Consumer Tools",
+    status: "dev"
+  },
+  {
+    name: "ImmaStop",
+    tagline: "A habit-reduction companion with a built-in crisis support system.",
+    why: "Built to help people step back from a habit, one day at a time.",
+    domain: "",
+    category: "Consumer Tools",
+    status: "dev"
+  },
+  {
+    name: "TruthDeed",
+    tagline: "Property due-diligence — know what you're buying before you commit.",
+    why: "Built to put real estate clarity in the buyer's hands.",
+    domain: "",
+    category: "Business SaaS",
+    status: "dev"
+  },
+  {
+    name: "MsKegel",
+    tagline: "Postpartum pelvic floor recovery with a guided coach.",
+    why: "Built to support new mothers through a quiet, important recovery.",
+    domain: "https://mskegel.com",
+    category: "Consumer Tools",
+    status: "dev"
+  },
+  {
+    name: "TheIshApp",
+    tagline: "Relationship accountability, grounded in scripture.",
+    why: "Built to help couples stay honest and intentional with each other.",
+    domain: "",
+    category: "Consumer Tools",
+    status: "dev"
+  },
+  {
+    name: "BeholdDeals",
+    tagline: "AI-powered aged-inventory clearance for automotive and RV.",
+    why: "Built to move stuck inventory and surface real deals.",
+    domain: "",
+    category: "Business SaaS",
+    status: "dev"
+  },
+  /* ---- placeholder slots — fill in anytime ---- */
+  { name: "Coming Soon", tagline: "A new build is on the way.", why: "Reserved slot for the next product in the family.", domain: "", category: "Business SaaS", status: "soon" },
+  { name: "Coming Soon", tagline: "A new build is on the way.", why: "Reserved slot for the next product in the family.", domain: "", category: "Faith", status: "soon" },
+  { name: "Coming Soon", tagline: "A new build is on the way.", why: "Reserved slot for the next product in the family.", domain: "", category: "Local Services", status: "soon" }
+];
+
+/* ============================================================
+   SUPABASE CLICK ANALYTICS (optional, ready to wire)
+   ------------------------------------------------------------
+   To enable persistent cross-visitor tracking:
+   1. Create a Supabase table:  bf_clicks (id, product, clicked_at)
+   2. Paste your project URL + anon key below.
+   3. Set ANALYTICS_ON = true.
+   Until then, visit counts fall back to in-memory for this
+   session so the UI still works.
+   ============================================================ */
+const ANALYTICS_ON = false;
+const SUPABASE_URL = "";      // e.g. https://xxxx.supabase.co
+const SUPABASE_ANON = "";     // your anon public key
+let sessionClicks = 0;
+
+async function logClick(product){
+  sessionClicks++;
+  document.getElementById('stat-clicks').textContent = sessionClicks;
+  if(!ANALYTICS_ON || !SUPABASE_URL || !SUPABASE_ANON) return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/bf_clicks`,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_ANON,
+        "Authorization":`Bearer ${SUPABASE_ANON}`,
+        "Prefer":"return=minimal"
+      },
+      body:JSON.stringify({ product: product, clicked_at: new Date().toISOString() })
+    });
+  }catch(e){ /* fail silently — never block the click-through */ }
+}
+
+/* ---------- RENDER ---------- */
+const badgeMap = { live:["live","Live"], dev:["dev","In Dev"], soon:["soon","Coming Soon"] };
+let activeFilter = "All";
+let searchTerm = "";
+
+function categories(){
+  return [...new Set(PORTFOLIO.map(p=>p.category))];
+}
+
+function renderFilters(){
+  const wrap = document.getElementById('filters');
+  const cats = ["All", ...categories()];
+  wrap.innerHTML = cats.map(c =>
+    `<button class="chip ${c===activeFilter?'active':''}" data-cat="${c}">${c}</button>`
+  ).join('');
+  wrap.querySelectorAll('.chip').forEach(ch=>{
+    ch.addEventListener('click',()=>{ activeFilter = ch.dataset.cat; renderFilters(); renderGrid(); });
+  });
+}
+
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  const list = PORTFOLIO.filter(p=>{
+    const okCat = activeFilter==="All" || p.category===activeFilter;
+    const okSearch = !searchTerm ||
+      (p.name+p.tagline+p.why+p.category).toLowerCase().includes(searchTerm.toLowerCase());
+    return okCat && okSearch;
+  });
+
+  if(list.length===0){
+    grid.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);padding:40px 0">No products match that search yet. Try a different term.</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map((p,i)=>{
+    const [bcls,blab] = badgeMap[p.status] || badgeMap.soon;
+    const isPlaceholder = p.status==="soon";
+    const hasLink = p.domain && p.domain.length>0;
+    const goBtn = hasLink
+      ? `<a class="go" href="${p.domain}" target="_blank" rel="noopener" data-name="${p.name}">Open ${p.name} &rarr;</a>`
+      : `<span class="go disabled">${isPlaceholder?'On the way':'Link coming soon'}</span>`;
+    return `
+      <article class="card ${isPlaceholder?'placeholder':''}">
+        <div class="card-top">
+          <h3>${p.name}</h3>
+          <span class="badge ${bcls}">${blab}</span>
+        </div>
+        <div class="cat-tag">${p.category}</div>
+        <div class="what">${p.tagline}</div>
+        <div class="why">${p.why}</div>
+        ${goBtn}
+      </article>`;
+  }).join('');
+
+  grid.querySelectorAll('.go[href]').forEach(a=>{
+    a.addEventListener('click',()=>logClick(a.dataset.name));
+  });
+}
+
+function renderStats(){
+  document.getElementById('stat-total').textContent = PORTFOLIO.filter(p=>p.status!=="soon").length;
+  document.getElementById('stat-live').textContent  = PORTFOLIO.filter(p=>p.status==="live").length;
+  document.getElementById('stat-cats').textContent  = categories().length;
+}
+
+/* ---------- EVENTS ---------- */
+document.getElementById('search').addEventListener('input',e=>{
+  searchTerm = e.target.value; renderGrid();
+});
+document.getElementById('surprise').addEventListener('click',()=>{
+  const linkable = PORTFOLIO.filter(p=>p.domain);
+  const pool = linkable.length?linkable:PORTFOLIO;
+  const pick = pool[Math.floor(Math.random()*pool.length)];
+  if(pick.domain){ logClick(pick.name); window.open(pick.domain,'_blank','noopener'); }
+  else { activeFilter="All"; searchTerm=pick.name; document.getElementById('search').value=pick.name; renderFilters(); renderGrid(); }
+});
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---------- INIT ---------- */
+renderFilters();
+renderGrid();
+renderStats();
+</script>
+</body>
+</html>
