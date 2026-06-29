@@ -1,0 +1,32 @@
+/* ERBrights palette — mirrors index.html :root vars exactly */
+:root {
+  --bg:        #0B0F14;
+  --surface:   #161B22;
+  --surface-2: #1F2630;
+  --border:    #283342;
+  --primary:   #2D8CFF;
+  --accent:    #25D0E0;
+  --text:      #F5F7FA;
+  --muted:     #8A97A8;
+  --live:      #2FCB7A;
+  --dev:       #F5B83D;
+  --soon:      #6B7686;
+
+  --maxw: 1180px;
+  --radius: 14px;
+  --shadow: 0 8px 30px rgba(0,0,0,.45);
+  --font-display: 'Georgia', 'Times New Roman', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; }
