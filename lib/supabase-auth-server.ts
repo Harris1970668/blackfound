@@ -26,11 +26,14 @@ export async function createAuthServerClient() {
   )
 }
 
-export async function getAdminUser() {
+export async function getCurrentUser() {
   const supabase = await createAuthServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   return user
 }
+
+// Alias kept so existing admin routes compile without changes
+export const getAdminUser = getCurrentUser
 
 export function isAdmin(email: string | null | undefined): boolean {
   return !!email && email === process.env.ADMIN_EMAIL
