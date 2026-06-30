@@ -96,6 +96,101 @@
 .statusSuspended { color: #ff6b6b; }
 .statusRemoved { color: var(--muted); }
 
+/* ---------- BILLING ---------- */
+
+.billingSection {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.billingSuccess {
+  background: rgba(47, 203, 122, 0.08);
+  border: 1px solid rgba(47, 203, 122, 0.3);
+  border-radius: 8px;
+  color: var(--live);
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 12px 16px;
+}
+
+.billingNote {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.billingWarn {
+  color: #ff6b6b;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.intervalToggle {
+  display: flex;
+  gap: 8px;
+}
+
+.intervalBtn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.intervalBtn:hover {
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.intervalBtnActive {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.billingPrice {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.billingBtn {
+  align-self: flex-start;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 28px;
+  transition: opacity 0.15s;
+}
+
+.billingBtn:hover:not(:disabled) { opacity: 0.88; }
+.billingBtn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+.billingError {
+  color: #ff6b6b;
+  font-size: 13px;
+  margin: 0;
+}
+
 /* ---------- FORM ---------- */
 
 .form {
@@ -134,6 +229,8 @@
 @media (max-width: 560px) {
   .row { grid-template-columns: 1fr; }
   .section { padding: 18px; }
+  .billingSection { padding: 18px; }
+  .intervalToggle { flex-direction: column; }
 }
 
 .field {

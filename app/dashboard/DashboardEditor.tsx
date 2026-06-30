@@ -3,6 +3,7 @@
 import { useState, KeyboardEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase-client'
+import PRICING from '@/lib/config'
 import s from './dashboard.module.css'
 
 const CATEGORIES = [
@@ -27,6 +28,8 @@ type Partner = {
   app_status: string | null
   listing_status: string
   pricing_tier: string
+  stripe_customer_id: string | null
+  subscription_status: string | null
 }
 
 type EditState = {
@@ -50,28 +53,59 @@ function statusClass(s_: string, styles: typeof s) {
   return styles.statusRemoved
 }
 
-export default function DashboardEditor({ partner, userEmail }: { partner: Partner; userEmail: string }) {
+const tierLabel: Record<string, string> = {
+  free: 'Free / Basic',
+  standard: 'Standard Partner',
+  featured: 'Featured Partner',
+  featured_plus: 'Featured+',
+}
+
+function priceDisplay(tier: string, interval: 'monthly' | 'annual'): string {
+  const tiers = PRICING.tiers as Record<string, { monthlyUsd: number; annualUsd: number } | undefined>
+  const t = tiers[tier]
+  if (!t || t.monthlyUsd === 0) return ''
+  return interval === 'monthly' ? `$${t.monthlyUsd}/month` : `$${t.annualUsd}/year`
+}
+
+export default function DashboardEditor({
+  partner,
+  userEmail,
+  checkoutResult,
+}: {
+  partner: Partner
+  userEmail: string
+  checkoutResult?: string
+}) {
   const router = useRouter()
   const supabase = createSupabaseBrowserClient()
 
+  // ── edit form state ──────────────────────────────────────────────────────
   const [form, setForm] = useState<EditState>({
-    app_name: partner.app_name ?? '',
-    tagline: partner.tagline ?? '',
-    app_url: partner.app_url ?? '',
-    description_long: partner.description_long ?? '',
-    problem_solved: partner.problem_solved ?? '',
-    app_audience: partner.app_audience ?? '',
-    category: partner.category ?? '',
-    subcategory: partner.subcategory ?? '',
-    platform: partner.platform ?? '',
-    pricing_model: partner.pricing_model ?? '',
-    app_status: partner.app_status ?? '',
+    app_name:         partner.app_name         ?? '',
+    tagline:          partner.tagline           ?? '',
+    app_url:          partner.app_url           ?? '',
+    description_long: partner.description_long  ?? '',
+    problem_solved:   partner.problem_solved    ?? '',
+    app_audience:     partner.app_audience      ?? '',
+    category:         partner.category          ?? '',
+    subcategory:      partner.subcategory       ?? '',
+    platform:         partner.platform          ?? '',
+    pricing_model:    partner.pricing_model     ?? '',
+    app_status:       partner.app_status        ?? '',
   })
 
-  const [tags, setTags] = useState<string[]>(partner.tags ?? [])
+  const [tags,     setTags]     = useState<string[]>(partner.tags ?? [])
   const [tagInput, setTagInput] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [saveMsg, setSaveMsg] = useState<{ text: string; ok: boolean } | null>(null)
+  const [saving,   setSaving]   = useState(false)
+  const [saveMsg,  setSaveMsg]  = useState<{ text: string; ok: boolean } | null>(null)
+
+  // ── billing state ────────────────────────────────────────────────────────
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('monthly')
+  const [billingLoading,  setBillingLoading]  = useState(false)
+  const [billingError,    setBillingError]    = useState<string | null>(null)
+
+  const needsBilling = partner.pricing_tier !== 'free'
+  const isSubscribed = partner.subscription_status === 'active' || partner.subscription_status === 'canceling'
 
   function set(field: keyof EditState, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -101,17 +135,17 @@ export default function DashboardEditor({ partner, userEmail }: { partner: Partn
     const { error } = await supabase
       .from('partners')
       .update({
-        app_name: form.app_name.trim(),
-        tagline: form.tagline.trim() || null,
-        app_url: form.app_url.trim(),
+        app_name:         form.app_name.trim(),
+        tagline:          form.tagline.trim() || null,
+        app_url:          form.app_url.trim(),
         description_long: form.description_long.trim() || null,
-        problem_solved: form.problem_solved.trim() || null,
-        app_audience: form.app_audience.trim() || null,
-        category: form.category,
-        subcategory: form.subcategory.trim() || null,
-        platform: form.platform || null,
-        pricing_model: form.pricing_model || null,
-        app_status: form.app_status || null,
+        problem_solved:   form.problem_solved.trim() || null,
+        app_audience:     form.app_audience.trim() || null,
+        category:         form.category,
+        subcategory:      form.subcategory.trim() || null,
+        platform:         form.platform || null,
+        pricing_model:    form.pricing_model || null,
+        app_status:       form.app_status || null,
         tags,
         updated_at: new Date().toISOString(),
       })
@@ -130,17 +164,51 @@ export default function DashboardEditor({ partner, userEmail }: { partner: Partn
     router.push('/dashboard/login')
   }
 
-  const tierLabel: Record<string, string> = {
-    free: 'Free / Basic',
-    standard: 'Standard Partner',
-    featured: 'Featured Partner',
-    featured_plus: 'Featured+',
+  async function handleCheckout() {
+    setBillingLoading(true)
+    setBillingError(null)
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ interval: billingInterval }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setBillingError(data.error ?? 'Could not start checkout.')
+        setBillingLoading(false)
+      } else {
+        window.location.href = data.url
+      }
+    } catch {
+      setBillingError('Network error. Please try again.')
+      setBillingLoading(false)
+    }
+  }
+
+  async function handlePortal() {
+    setBillingLoading(true)
+    setBillingError(null)
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) {
+        setBillingError(data.error ?? 'Could not open billing portal.')
+        setBillingLoading(false)
+      } else {
+        window.location.href = data.url
+      }
+    } catch {
+      setBillingError('Network error. Please try again.')
+      setBillingLoading(false)
+    }
   }
 
   return (
     <div className={s.page}>
       <div className={s.inner}>
 
+        {/* HEADER */}
         <div className={s.header}>
           <div className={s.headerLeft}>
             <h1 className={s.title}>Black<span>Found</span> Dashboard</h1>
@@ -149,7 +217,7 @@ export default function DashboardEditor({ partner, userEmail }: { partner: Partn
           <button className={s.signOut} onClick={handleSignOut}>Sign out</button>
         </div>
 
-        {/* Read-only status */}
+        {/* STATUS CARD */}
         <div className={s.statusCard}>
           <div className={s.statusItem}>
             <span className={s.statusLabel}>Listing status</span>
@@ -161,16 +229,102 @@ export default function DashboardEditor({ partner, userEmail }: { partner: Partn
             <span className={s.statusLabel}>Current tier</span>
             <span className={s.statusValue}>{tierLabel[partner.pricing_tier] ?? partner.pricing_tier}</span>
           </div>
-          {partner.listing_status === 'draft' && (
+          {partner.subscription_status && (
             <div className={s.statusItem}>
-              <span className={s.statusLabel}>Next step</span>
-              <span className={s.statusValue} style={{ color: 'var(--muted)', fontWeight: 400, fontSize: 13 }}>
-                Complete billing to go live
+              <span className={s.statusLabel}>Subscription</span>
+              <span className={s.statusValue} style={{ textTransform: 'capitalize' }}>
+                {partner.subscription_status}
               </span>
             </div>
           )}
         </div>
 
+        {/* BILLING */}
+        {needsBilling && (
+          <div className={s.billingSection}>
+            <div className={s.sectionTitle}>Billing</div>
+
+            {checkoutResult === 'success' && (
+              <div className={s.billingSuccess}>
+                Payment received. Your listing will go live shortly once the subscription is confirmed.
+              </div>
+            )}
+            {checkoutResult === 'canceled' && (
+              <div className={s.billingNote}>
+                Checkout was canceled. Your listing remains in draft until a subscription is active.
+              </div>
+            )}
+
+            {isSubscribed ? (
+              <>
+                {partner.subscription_status === 'canceling' && (
+                  <p className={s.billingNote}>
+                    Your subscription is active through the end of the current billing period.
+                    Your listing will remain live until then.
+                  </p>
+                )}
+                <button
+                  className={s.billingBtn}
+                  onClick={handlePortal}
+                  disabled={billingLoading}
+                >
+                  {billingLoading ? 'Opening...' : 'Manage billing'}
+                </button>
+              </>
+            ) : (
+              <>
+                {partner.subscription_status === 'past_due' && (
+                  <p className={s.billingWarn}>
+                    Payment failed. Subscribe below to restore your listing.
+                  </p>
+                )}
+                {partner.subscription_status === 'unpaid' && (
+                  <p className={s.billingWarn}>
+                    Your listing is suspended due to a payment issue. Subscribe below to reactivate.
+                  </p>
+                )}
+                {!partner.subscription_status && (
+                  <p className={s.billingNote}>
+                    Your listing is in draft. Start a subscription to go live on the platform.
+                  </p>
+                )}
+
+                <div className={s.intervalToggle}>
+                  <button
+                    type="button"
+                    className={`${s.intervalBtn} ${billingInterval === 'monthly' ? s.intervalBtnActive : ''}`}
+                    onClick={() => setBillingInterval('monthly')}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    type="button"
+                    className={`${s.intervalBtn} ${billingInterval === 'annual' ? s.intervalBtnActive : ''}`}
+                    onClick={() => setBillingInterval('annual')}
+                  >
+                    Annual — 20% off
+                  </button>
+                </div>
+
+                <div className={s.billingPrice}>
+                  {priceDisplay(partner.pricing_tier, billingInterval)}
+                </div>
+
+                <button
+                  className={s.billingBtn}
+                  onClick={handleCheckout}
+                  disabled={billingLoading}
+                >
+                  {billingLoading ? 'Opening checkout...' : 'Start subscription'}
+                </button>
+              </>
+            )}
+
+            {billingError && <p className={s.billingError}>{billingError}</p>}
+          </div>
+        )}
+
+        {/* EDIT FORM */}
         <form className={s.form} onSubmit={handleSave} noValidate>
 
           {/* APP INFO */}

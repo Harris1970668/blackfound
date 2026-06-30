@@ -3,15 +3,20 @@ import { getCurrentUser, createAuthServerClient } from '@/lib/supabase-auth-serv
 import DashboardEditor from './DashboardEditor'
 import s from './dashboard.module.css'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>
+}) {
   const user = await getCurrentUser()
   if (!user) redirect('/dashboard/login')
 
-  // Query through the auth client so RLS applies — returns only this user's row
+  const { checkout } = await searchParams
+
   const supabase = await createAuthServerClient()
   const { data: partner, error } = await supabase
     .from('partners')
-    .select('id, app_name, tagline, app_url, description_long, problem_solved, app_audience, tags, category, subcategory, platform, pricing_model, app_status, listing_status, pricing_tier')
+    .select('id, app_name, tagline, app_url, description_long, problem_solved, app_audience, tags, category, subcategory, platform, pricing_model, app_status, listing_status, pricing_tier, stripe_customer_id, subscription_status')
     .maybeSingle()
 
   if (error) console.error('Dashboard fetch error:', error)
@@ -25,9 +30,9 @@ export default async function DashboardPage() {
             <br />
             If you received an invite link, use it to claim your dashboard.
             <br />
-            Questions? Email{' '}
-            <a href="mailto:pulsenetworkadmin@gmail.com" style={{ color: 'var(--primary)' }}>
-              pulsenetworkadmin@gmail.com
+            Questions?{' '}
+            <a href="/contact" style={{ color: 'var(--primary)' }}>
+              Contact The Administration
             </a>
           </div>
         </div>
@@ -35,5 +40,11 @@ export default async function DashboardPage() {
     )
   }
 
-  return <DashboardEditor partner={partner} userEmail={user.email ?? ''} />
+  return (
+    <DashboardEditor
+      partner={partner}
+      userEmail={user.email ?? ''}
+      checkoutResult={checkout}
+    />
+  )
 }
